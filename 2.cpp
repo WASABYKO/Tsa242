@@ -44,7 +44,7 @@ double Area(const double radius) {
 }
 
 double getValue() {
-    double radius;
+    double radius = 0;
     cin >> radius;
     if ((cin.fail());(radius<=0) ) {
         cout << "Только числа и только положительные" << endl;
