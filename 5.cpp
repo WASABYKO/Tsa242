@@ -128,9 +128,10 @@ switch(FM(choice)) {
         cout << "3. Ошибка: первый элемент равен 0, деление невозможно";
         abort();
     }
-    return 0;
     delete [] arr;
     delete [] work_arr;
+    return 0;
+    
 }
 
 void fillRandom(int* arr, const size_t n, const int min, const int max) {
