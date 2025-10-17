@@ -14,14 +14,13 @@ using namespace std;
  * - RANDOM — заполнение случайными числами,
  * - MANUAL — заполнение вручную пользователем.
  */
-
 enum FM {
-    RANDOM=1,
-    MANUAL=2
+    RANDOM = 1,
+    MANUAL = 2
 };
 
 /**
- * @brief - Заполняет массив случайными числами в заданном диапазоне
+ * @brief Заполняет массив случайными числами в заданном диапазоне
  * @param arr - массив для заполнения
  * @param n - размер массива
  * @param min - минимальное значение
@@ -30,84 +29,89 @@ enum FM {
 void fillRandom(int* arr, const size_t n, const int min, const int max);
 
 /**
- * @brief - Вычисляет сумму элементов с нечетными индексами
+ * @brief Вычисляет сумму элементов с нечетными индексами
  * @param arr - массив чисел
  * @param n - размер массива
- * @return - возвращает сумму элементов
+ * @return возвращает сумму элементов
  */
 int sumOddIndexes(const int* arr, const size_t n);
 
 /**
- * @brief - Подсчитывает элементы больше A и кратные 5
+ * @brief Подсчитывает элементы больше A и кратные 5
  * @param arr - массив чисел
  * @param n - размер массива
  * @param A - заданное число для сравнения
- * @return - возвращает количество элементов
+ * @return возвращает количество элементов
  */
 int countElements(const int* arr, const size_t n, const int A);
 
 /**
- * @brief - Делит элементы с четными номерами на первый элемент
+ * @brief Делит элементы с четными номерами на первый элемент
  * @param arr - массив чисел
  * @param n - размер массива
+ * @return true если операция выполнена успешно, false в случае ошибки
  */
-void divideEvenNumbered(int* arr, const size_t n);
+bool divideEvenNumbered(int* arr, const size_t n);
 
 /**
- * @brief - Выводит массив на экран
+ * @brief Выводит массив на экран
  * @param arr - массив чисел
  * @param n - размер массива
  */
 void printArray(const int* arr, const size_t n);
 
 /**
- * @brief - Безопасный ввод числа с проверкой
+ * @brief Безопасный ввод числа с проверкой
  * @param message - сообщение для пользователя
- * @return - возвращает введенное число
+ * @return возвращает введенное число
  */
 int safeInput(const string& message);
-
-/**
- * @brief точка входа в программу
- * @return 0, если прогамма выполнена корректно, иначе 1 
- */
 
 int main() {
     srand(time(0));
     
     // Ввод диапазона
     int min_val = safeInput("Введите минимальное значение диапазона: ");
-
     int max_val = safeInput("Введите максимальное значение диапазона: ");
     
     if(min_val > max_val) {
-        cout << "Минимальное значение больше максимального.";
+        cout << "Минимальное значение больше максимального. Значения будут поменяны местами." << endl;
         swap(min_val, max_val);
     }
     
     size_t n = safeInput("Введите размер массива: ");
+    
+    if(n == 0) {
+        cout << "Размер массива не может быть равен 0." << endl;
+        return 1;
+    }
+    
     int* arr = new int[n];
     int* work_arr = new int[n];
     
-   // Заполнение массива
-cout << "Заполнить массив: " << (FM::RANDOM) << " - Случайными числами " << (FM::MANUAL) << " - Вручную" << " Выберите вариант: "<<endl;
-int choice = safeInput("");
-
-switch(FM(choice)) {
-    case FM::RANDOM:
-        fillRandom(arr, n, min_val, max_val);
-        break;
-    case FM::MANUAL:
-        cout << "Введите " << n << " элементов массива:\n";
-        for(size_t i = 0; i < n; i++) {
-            arr[i] = safeInput("Элемент " + to_string(i) + ": ");
-        }
-        break;
-    default:
-        cout << "Неверное значение" << endl;
-        return 1;
-        delete [] arr;
-}
+    // Заполнение массива
+    cout << "Заполнить массив: " << FM::RANDOM << " - Случайными числами, " 
+         << FM::MANUAL << " - Вручную. Выберите вариант: ";
+    int choice = safeInput("");
+    
+    switch(FM(choice)) {
+        case FM::RANDOM:
+            fillRandom(arr, n, min_val, max_val);
+            break;
+        case FM::MANUAL:
+            cout << "Введите " << n << " элементов массива:" << endl;
+            for(size_t i = 0; i < n; i++) {
+                arr[i] = safeInput("Элемент " + to_string(i) + ": ");
+            }
+            break;
+        default:
+            cout << "Неверное значение" << endl;
+            delete[] arr;
+            delete[] work_arr;
+            return 1;
+    }
+    
+    // Копируем исходный массив для работы
     copy(arr, arr + n, work_arr);
     
     cout << "Исходный массив: ";
@@ -120,18 +124,17 @@ switch(FM(choice)) {
     cout << "2. Количество элементов > " << A << " и кратных 5: " 
          << countElements(work_arr, n, A) << endl;
  
-    if(work_arr[0] != 0) {
-        divideEvenNumbered(work_arr, n);
+    // Деление элементов с четными номерами
+    if(divideEvenNumbered(work_arr, n)) {
         cout << "3. Массив после деления элементов с четными номерами: ";
         printArray(work_arr, n);
     } else {
-        cout << "3. Ошибка: первый элемент равен 0, деление невозможно";
-        abort();
+        cout << "3. Операция деления не выполнена." << endl;
     }
-    delete [] arr;
-    delete [] work_arr;
-    return 0;
     
+    delete[] arr;
+    delete[] work_arr;
+    return 0;
 }
 
 void fillRandom(int* arr, const size_t n, const int min, const int max) {
@@ -140,7 +143,7 @@ void fillRandom(int* arr, const size_t n, const int min, const int max) {
     }
 }
 
-int sumOddIndexes(const int* arr, const size_t n){
+int sumOddIndexes(const int* arr, const size_t n) {
     int sum = 0;
     for(size_t i = 1; i < n; i += 2) {
         sum += arr[i];
@@ -158,11 +161,22 @@ int countElements(const int* arr, const size_t n, const int A) {
     return count;
 }
 
-void divideEvenNumbered(int* arr, const size_t n) {
+bool divideEvenNumbered(int* arr, const size_t n) {
+    if (n == 0) {
+        cout << "Ошибка: массив пуст" << endl;
+        return false;
+    }
+    
+    if (arr[0] == 0) {
+        cout << "Ошибка: первый элемент равен 0, деление невозможно" << endl;
+        return false;
+    }
+    
     int first = arr[0];
-for(size_t i = 1; i < n; i += 2) {
+    for(size_t i = 2; i < n; i += 2) {
         arr[i] /= first;
     }
+    return true;
 }
 
 void printArray(const int* arr, const size_t n) {
@@ -175,10 +189,12 @@ void printArray(const int* arr, const size_t n) {
 int safeInput(const string& message) {
     int value = 0;
     cout << message;
-    cin >> value;
-    if(cin.fail()) {
-    cout << "Ошибка ввода. Пожалуйста, введите целое число.";
-    abort();
-        } 
-    return value;
+    
+    while(!(cin >> value)) {
+        cout << "Ошибка ввода. Пожалуйста, введите целое число: ";
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
     }
+    
+    return value;
+}
